@@ -1,0 +1,47 @@
+{
+  "autoload": {
+    "psr-4": {
+      "ideasonpurpose\\": [
+        "lib/"
+      ]
+    }
+  },
+  "config": {
+    "vendor-dir": "wp-content"
+  },
+  "minimum-stability": "dev",
+  "require": {
+    "ideasonpurpose/wp-theme-init": "dev-master",
+    "ideasonpurpose/wp-caption-hoist-class": "dev-master",
+    "ideasonpurpose/wp-googleanalytics": "dev-master",
+    "ideasonpurpose/wp-social-share-links": "dev-master",
+    "ideasonpurpose/wp-vimeo-embed": "dev-master"
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/ideasonpurpose/wp-theme-init"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/ideasonpurpose/wp-caption-hoist-class"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/ideasonpurpose/wp-googleanalytics"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/ideasonpurpose/wp-social-share-links"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/ideasonpurpose/wp-global-comments-disable"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/ideasonpurpose/wp-vimeo-embed"
+    }
+  ],
+  "version": "0.1.5"
+}

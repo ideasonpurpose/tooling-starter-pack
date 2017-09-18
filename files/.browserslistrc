@@ -1,0 +1,9 @@
+# supported browsers
+# See https://github.com/ai/browserslist for more info
+# based on data from http://caniuse.com/
+
+> 5%
+last 4 versions
+
+# Safari 8    # for automated testing
+Safari >= 4 # for for automated testing

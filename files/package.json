@@ -1,0 +1,44 @@
+{
+  "name": "placeholder",
+  "version": "0.0.1",
+  "description": "placeholder",
+  "private": true,
+  "scripts": {
+    "webpack": "webpack",
+    "env": "env",
+    "_webpack-stats":
+      "webpack --profile --json --config=wp-content/themes/iop/src/webpack.config.js > wp-content/themes/iop/dist/js/stats.json",
+    "analyzejs":
+      "npm run _webpack-stats && webpack-bundle-analyzer wp-content/themes/iop/dist/js/stats.json",
+    "version": "version-everything && git add -u",
+    "postversion": "NODE_ENV=production gulp build"
+  },
+  "devDependencies": {
+    "autoprefixer": "^7.1.4",
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-preset-env": "^1.6.0",
+    "browser-sync": "^2.18.13",
+    "browsersync-mdns": "^1.0.1",
+    "bs-fullscreen-message": "^1.1.0",
+    "case-sensitive-paths-webpack-plugin": "^2.1.1",
+    "css-loader": "^0.28.7",
+    "del": "^3.0.0",
+    "extract-text-webpack-plugin": "^3.0.0",
+    "find-up": "^2.1.0",
+    "globby": "^6.1.0",
+    "gulp": "^3.9.1",
+    "gulp-changed": "^3.1.0",
+    "gulp-imagemin": "^3.3.0",
+    "gulp-postcss": "^7.0.0",
+    "gulp-sass": "^3.1.0",
+    "gulp-sourcemaps": "^2.6.1",
+    "gulp-util": "^3.0.8",
+    "gulp-zip": "^4.0.0",
+    "read-pkg-up": "^2.0.0",
+    "run-sequence": "^2.1.0",
+    "version-everything": "^0.1.5",
+    "webpack": "^3.5.6"
+  },
+  "version_files": []
+}
