@@ -1,5 +1,5 @@
 /**
- * Version: 0.1.2
+ * Version: 0.1.3
  */
 const path = require("path");
 const readPkgUp = require("read-pkg-up");
