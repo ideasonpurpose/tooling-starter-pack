@@ -23,7 +23,7 @@ Project-Name
 ```
 
 $ cd Project-Name`
-$ npm install ideasonpurpose/wp-boilerplate
+$ npm install ideasonpurpose/tooling-starter-pack
 $ 
 
 * Inject a consistent directory structure into the theme file:
