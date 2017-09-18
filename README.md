@@ -24,7 +24,7 @@ Project-Name
 
 $ cd Project-Name`
 $ npm install ideasonpurpose/tooling-starter-pack
-$ 
+$ $(npm bin)/wpinit
 
 * Inject a consistent directory structure into the theme file:
 	

@@ -170,8 +170,9 @@ const composer = function(dest) {
             .readJson(`${__dirname}/files/composer.json`)
             .then(template => {
               const vendorDir = path.relative("./site", dest) + "/vendor";
-              // force new vendor-dir
-              pkg.config["vendor-dir"] = vendorDir;
+              // force new config["vendor-dir"]
+              _.set(pkg, ['config', 'vendor-dir'], vendorDir);
+              // pkg.config["vendor-dir"] = vendorDir;
               return _.defaultsDeep({}, pkg, template);
             })
             .then(pkg =>
