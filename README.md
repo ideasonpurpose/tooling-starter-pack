@@ -26,16 +26,6 @@ $ cd Project-Name`
 $ npm install ideasonpurpose/tooling-starter-pack
 $ $(npm bin)/wpinit
 
-* Inject a consistent directory structure into the theme file:
-	
-```
-Theme root
-├── dist
-├─┬ src
-│ ├── js
-│ └── scss
-```
-
 ## wpinit
 
 Currently this is the only command, `wpinit` which is focused on building out a WordPress site. 
@@ -58,11 +48,29 @@ Copy and customize **package.json** **composer.json** file into the theme root, 
 
 Runs `npm install` and `composer install`
 
+Inject a consistent directory structure into the theme file:
+    
+```
+Theme root
+├── acf-json
+├── dist
+├── lib
+├─┬ src
+│ ├── images
+│ ├── js
+│ └── scss
+```
+
+
+
 When it's done, the site should be buildable:
 ```
 $ cd site
 $ gulp build
 ```
+
+
+
 
 ## Leftovers
 

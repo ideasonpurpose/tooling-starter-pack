@@ -99,6 +99,7 @@ const mkDirs = function(dest) {
     fs.ensureDir(`${dest}/src/images`),
     fs.ensureDir(`${dest}/dist`),
     fs.ensureDir(`${dest}/lib`)
+    fs.ensureDir(`${dest}/acf-json`)
   ]).then(() => dest);
 };
 
