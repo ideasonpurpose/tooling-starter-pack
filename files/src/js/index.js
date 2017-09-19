@@ -5,3 +5,7 @@
 const path = require("path");
 __webpack_public_path__ =
   path.dirname(document.scripts[document.scripts.length - 1].src) + "/";
+
+const $ = require("jquery");
+window.$ = $;
+window.jQuery = $;
