@@ -171,15 +171,40 @@ const composer = function(dest) {
             .readJson(`${__dirname}/files/composer.json`)
             .then(template => {
               const vendorDir = path.relative("./site", dest) + "/vendor";
+
+              // Set correct path for PSR-4 autoloader
+              _.set(
+                template,
+                ["autoload", "psr-4", "ideasonpurpose\\"],
+                [path.relative("./site", `${dest}/lib`)]
+              );
+
               // force new config["vendor-dir"]
-              _.set(pkg, ['config', 'vendor-dir'], vendorDir);
+              _.set(pkg, ["config", "vendor-dir"], vendorDir);
 
               // Add extra stuff for wp-bootstrap-navwalker
-              _.set(pkg, ['extra', 'installer-paths', vendorDir + '/wp-bootstrap-navwalker'], ["wp-bootstrap/wp-bootstrap-navwalker"]);
-              if (_.get(pkg, ['autoload', 'files']) && _.isArray(pkg.autoload.files)) {
-                pkg.autoload.files = _.union(pkg.autoload.files, [vendorDir + '/wp-bootstrap-navwalker/class-wp-bootstrap-navwalker.php'])
+              _.set(
+                pkg,
+                [
+                  "extra",
+                  "installer-paths",
+                  `${vendorDir}/wp-bootstrap-navwalker`
+                ],
+                ["wp-bootstrap/wp-bootstrap-navwalker"]
+              );
+              if (
+                _.get(pkg, ["autoload", "files"]) &&
+                _.isArray(pkg.autoload.files)
+              ) {
+                pkg.autoload.files = _.union(pkg.autoload.files, [
+                  `${vendorDir}/wp-bootstrap-navwalker/class-wp-bootstrap-navwalker.php`
+                ]);
               } else {
-                _.set(template.autoload.files = [vendorDir + '/wp-bootstrap-navwalker/class-wp-bootstrap-navwalker.php']);
+                _.set(
+                  (template.autoload.files = [
+                    `${vendorDir}/wp-bootstrap-navwalker/class-wp-bootstrap-navwalker.php`
+                  ])
+                );
               }
 
               return _.defaultsDeep({}, pkg, template);
@@ -248,7 +273,7 @@ const installs = () => {
     });
 };
 
-const execPromise = (cmd) => {
+const execPromise = cmd => {
   return new Promise((resolve, reject) => {
     exec(cmd, { cwd: "./site" }, (error, stdout, stderr) => {
       if (error) {
