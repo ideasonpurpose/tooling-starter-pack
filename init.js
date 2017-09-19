@@ -98,7 +98,7 @@ const mkDirs = function(dest) {
 
     fs.ensureDir(`${dest}/src/images`),
     fs.ensureDir(`${dest}/dist`),
-    fs.ensureDir(`${dest}/lib`)
+    fs.ensureDir(`${dest}/lib`),
     fs.ensureDir(`${dest}/acf-json`)
   ]).then(() => dest);
 };
@@ -173,7 +173,15 @@ const composer = function(dest) {
               const vendorDir = path.relative("./site", dest) + "/vendor";
               // force new config["vendor-dir"]
               _.set(pkg, ['config', 'vendor-dir'], vendorDir);
-              // pkg.config["vendor-dir"] = vendorDir;
+
+              // Add extra stuff for wp-bootstrap-navwalker
+              _.set(pkg, ['extra', 'installer-paths', vendorDir + '/wp-bootstrap-navwalker'], ["wp-bootstrap/wp-bootstrap-navwalker"]);
+              if (_.get(pkg, ['autoload', 'files']) && _.isArray(pkg.autoload.files)) {
+                pkg.autoload.files = _.union(pkg.autoload.files, [vendorDir + '/wp-bootstrap-navwalker/class-wp-bootstrap-navwalker.php'])
+              } else {
+                _.set(template.autoload.files = [vendorDir + '/wp-bootstrap-navwalker/class-wp-bootstrap-navwalker.php']);
+              }
+
               return _.defaultsDeep({}, pkg, template);
             })
             .then(pkg =>

@@ -18,6 +18,13 @@
     "slug": "^0.9.1",
     "version-everything": "^0.1.5"
   },
+  "bugs": {
+    "url": "https://github.com/ideasonpurpose/tooling-starter-pack/issues"
+  },
+  "respository": {
+    "type": "git",
+    "url": "git+https://github.com/ideasonpurpose/tooling-starter-pack.git"
+  },
   "author": "Joe Maller <joe@joemaller.com> (http://www.joemaller.com)",
   "license": "ISC",
   "todo:add-to-version_files": "files/csscomb.json",
