@@ -132,7 +132,7 @@ const npm = function(dest) {
 
               // manually pre-merge version_files into array
               pkg.version_files = _.union(_.flatten([pkg.version_files]), [
-                path.relative("./site", dest) + "/styles.css"
+                path.relative("./site", dest) + "/style.css"
               ]).filter(n => n);
               return _.defaultsDeep({}, pkg, template);
             })
