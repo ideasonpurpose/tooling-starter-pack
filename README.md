@@ -10,6 +10,9 @@ Bsides bootstrapping new projects, this is intended to be the single source of t
 TODO: 
 	1. Figure out if we're above wp-content or parallel to it. 
 	3. This should be installed with npm direct from the GitHub repo, process goes something like this:
+    
+## Conventions
+For WordPress themes, the `name` in **package.json** should be the theme-directory. 
 
 ##Installation
 
@@ -19,7 +22,7 @@ The wpinit command expects project expects a directory structure like this:
 Project-Name
 └─┬ site
   └─┬ wp-content
- 	  └── themes
+    └── themes
 ```
 
 $ cd Project-Name`
@@ -55,10 +58,10 @@ Theme root
 ├── acf-json
 ├── dist
 ├── lib
-├─┬ src
-│ ├── images
-│ ├── js
-│ └── scss
+└─┬ src
+  ├── images
+  ├── js
+  └── scss
 ```
 
 
