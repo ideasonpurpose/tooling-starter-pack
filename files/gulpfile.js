@@ -1,8 +1,9 @@
 /**
+ * IOP Web Tooling Starter Pack
  * Version: 0.1.3
  */
 const path = require("path");
-const readPkgUp = require("read-pkg-up");
+
 const gulp = require("gulp");
 const gutil = require("gulp-util");
 const chalk = gutil.colors;
@@ -20,6 +21,7 @@ const zip = require("gulp-zip");
 
 const del = require("del");
 const runSequence = require("run-sequence");
+const once = require("lodash.once");
 
 const pkg = require("./package.json");
 
@@ -41,12 +43,7 @@ const DEVURL =
   path.basename(path.dirname(findUp.sync("Vagrantfile")), ".dev") +
   ".dev";
 
-// assume the first non-twenty* theme in wp-content/themes is our theme
-// should pull this from package.json if possible or just put the gulpfile in there
-// const THEME_DIR = globby
-//   .sync(['./wp-content/themes/*/', '!./wp-content/themes/twenty*/'])[0]
-//   .slice(0, -1);
-const THEME_DIR = `./wp-content/themes/${pkg.wp_theme}`;
+const THEME_DIR = `./wp-content/themes/${pkg.name}`;
 const SRC_DIR = THEME_DIR + "/src";
 const DIST_DIR = THEME_DIR + "/dist";
 const BUILD_DIR = "./builds";
@@ -108,7 +105,7 @@ gulp.task("sass", function() {
 
 gulp.task("imagemin", function() {
   return gulp
-    .src(SRC_DIR + "/images/**/*")
+    .src(`${SRC_DIR}/images/**/*`)
     .pipe(
       imagemin(
         [
@@ -130,7 +127,7 @@ gulp.task("imagemin", function() {
         { verbose: false }
       )
     )
-    .pipe(gulp.dest(DIST_DIR + "/images"))
+    .pipe(gulp.dest(`${DIST_DIR}/images`))
     .pipe(browserSync.stream());
 });
 
@@ -154,18 +151,27 @@ gulp.task("zip", function() {
 gulp.task("webpack", function(callback) {
   const isWatch = process.argv.indexOf("watch") > -1;
   const compiler = webpack(require("./webpack.config.js"));
+  let cb = once(callback);
+
   if (isWatch) {
-    compiler.watch(200, function(err, stats) {
+    compiler.watch({ aggregateTimeout: 300, poll: 500 }, (err, stats) => {
       if (err) {
-        gutil.log(err);
+        console.error(err.stack || err);
+        if (err.details) {
+          console.error(err.details);
+        }
         return;
       }
       gutil.log(stats.toString({ colors: true }));
-      if (stats.toJson().assets.length) {
-        browserSync.reload(stats.toJson().assets[0].name);
-      }
+
+      cb();
+
+      const assets = stats
+        .toJson()
+        .assets.map(c => c.name)
+        .filter(c => c.slice(-4) !== ".map");
+      browserSync.reload(assets);
     });
-    callback();
   } else {
     compiler.run(function(err, stats) {
       gutil.log(stats.toString({ colors: true }));
@@ -176,7 +182,7 @@ gulp.task("webpack", function(callback) {
 
 gulp.task("watch", ["build"], function() {
   browserSync.init({
-    files: THEME_DIR + "/**/*.php",
+    files: `${THEME_DIR}/**/*.php`,
     logConnections: true,
     open: false,
     plugins: ["bs-fullscreen-message", "browsersync-mdns"],
