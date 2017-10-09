@@ -1,0 +1,43 @@
+/**
+ * This file is intended to be imported into another selector,
+ * usually the .post-content, .page-content or some similar wrapper
+ * around user-authored content.
+ *
+ *  ** Example **
+ *  To apply these styles to the .post-content selector:
+ *
+ *  .post-content {
+ *    @include "post-content";
+ *  }
+ */
+
+p {
+  a {
+  }
+
+  a:active {
+  }
+}
+
+ul,
+ol {
+  li {
+  }
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+}
+
+h1 {
+}
+
+blockquote {
+  &,
+  & p {
+  }
+}

@@ -1,0 +1,36 @@
+#tinymce {
+  ul,
+  ol {
+    overflow: hidden;
+
+    padding-left: 5em;
+  }
+
+  ol {
+    padding-left: 2.5em;
+  }
+
+  p:first-child {
+    margin-top: 0;
+  }
+
+  img.size-half-width {
+    width: 50%;
+    height: auto;
+  }
+
+  img.size-third-width {
+    width: 33%;
+    height: auto;
+  }
+
+  img.size-full-width {
+    width: 100%;
+    height: auto;
+  }
+
+  img.alignright,
+  img.alignleft {
+    margin-top: 0; // matches second paragraph top margin in editor-styles.css
+  }
+}
