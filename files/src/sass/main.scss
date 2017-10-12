@@ -1,11 +1,11 @@
 
+@import "colors";
+
 @import "bootstrap-custom";
 
 @import "bootstrap/scss/bootstrap";
 
 @import "bootstrap-overrides";
-
-@import "colors";
 
 body {
   background: $yolk;
