@@ -18,6 +18,8 @@ const autoprefixer = require("autoprefixer");
 const postcss = require("gulp-postcss");
 const webpack = require("webpack");
 const zip = require("gulp-zip");
+const replace = require("gulp-replace");
+const filter = require("gulp-filter");
 
 const del = require("del");
 const runSequence = require("run-sequence");
@@ -133,10 +135,20 @@ gulp.task("imagemin", function() {
 
 gulp.task("zip", function() {
   const pkg = require("./package.json");
-  const zipFile = (pkg.name + " " + pkg.version).replace(/[ .]/g, "_") + ".zip";
+  const versionDir = (pkg.name + " " + pkg.version).replace(/[ .]/g, "_");
+  const zipFile = `${versionDir}.zip`;
+  const autoloadFilter = filter("**/composer/autoload*.php", { restore: true });
 
   return gulp
     .src([`${THEME_DIR}/**/*`, `!${SRC_DIR}`])
+    .pipe(autoloadFilter)
+    .pipe(
+      replace(
+        `wp-content/themes/${pkg.name}/`,
+        `wp-content/themes/${versionDir}/`
+      )
+    )
+    .pipe(autoloadFilter.restore)
     .pipe(zip(zipFile))
     .pipe(gulp.dest(BUILD_DIR))
     .on("data", function(data) {
