@@ -2,10 +2,11 @@
 
 This boilerplate is purely about tooling, it is theme agnostic and can be used with any theme files.
 
-These are the common tools we use to build out our WordPress projects. Project 
-The process we use for building out a new WordPress project. This includes:
+These are the common tools we use to build out our WordPress projects. This includes:
 
-Bsides bootstrapping new projects, this is intended to be the single source of truth for the included config files. Instead of trying to keep track of which project has the most recent version, changes will be pushed here.
+Besides bootstrapping new projects, this is intended to be the single source of truth for the included configuration files. Instead of trying to keep track of which project has the most recent version, changes will be pushed here.
+
+All files are versioned with [version-everything][] so 
 
 TODO: 
 	1. Figure out if we're above wp-content or parallel to it. 
@@ -16,7 +17,7 @@ For WordPress themes, the `name` in **package.json** should be the theme-directo
 
 ##Installation
 
-The wpinit command expects project expects a directory structure like this:
+The `wpinit` command expects project expects a directory structure like this:
 
 ```
 Project-Name
@@ -88,3 +89,6 @@ Tooling Starter Pack
 tool baseline
 foundation tools
 build chain starter pack
+
+
+[version-everything]: https://www.npmjs.com/package/version-everything

@@ -1,4 +1,5 @@
 /**
+ * iop-web-tooling-starter-pack
  * Version: 0.1.3
  */
 module.exports = {

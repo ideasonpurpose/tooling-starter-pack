@@ -83,7 +83,8 @@ gulp.task("sass", function() {
     .pipe(
       sass({
         // sourceComments: true,
-        // outputStyle: 'expanded',
+        // outputStyle: "expanded",
+        // outputStyle: "compact",
         outputStyle: "compressed",
         includePaths: ["node_modules"]
       })
