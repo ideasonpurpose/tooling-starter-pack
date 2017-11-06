@@ -29,10 +29,7 @@ module.exports = {
 
   devtool: "source-map",
 
-  stats: {
-    color: true,
-    version: true
-  },
+  stats: "normal",
 
   module: {
     rules: [
@@ -100,6 +97,7 @@ module.exports = {
       }
     ]
   },
+
   resolve: {
     extensions: [".js", ".vue", ".json"],
     alias: {

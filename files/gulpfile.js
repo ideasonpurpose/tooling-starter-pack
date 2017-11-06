@@ -136,7 +136,7 @@ gulp.task("imagemin", function() {
 
 gulp.task("zip", function() {
   const pkg = require("./package.json");
-  const versionDir = (pkg.name + " " + pkg.version).replace(/[ .]/g, "_");
+  const versionDir = `${pkg.name}-${pkg.version}`.replace(/[ .]/g, "_");
   const zipFile = `${versionDir}.zip`;
   const autoloadFilter = filter("**/composer/autoload*.php", { restore: true });
 
