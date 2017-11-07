@@ -29,6 +29,7 @@
   "license": "ISC",
   "todo:add-to-version_files": "files/csscomb.json",
   "version_files": [
+    "README.md",
     "files/composer.json",
     "files/gulpfile.js",
     "files/webpack.config.js",
