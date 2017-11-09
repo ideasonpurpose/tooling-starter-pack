@@ -17,8 +17,8 @@ blConfig = {
 module.exports = {
   context: path.resolve(`./wp-content/themes/${pkg.name}/src`),
   entry: {
-    app: './js/index.js',
-    admin: './js/admin.js'
+    app: "./js/index.js",
+    admin: "./js/admin.js"
   },
 
   output: {
@@ -78,7 +78,6 @@ module.exports = {
         loader: "vue-loader",
         options: {
           loaders: {
-            // scss: 'vue-style-loader!css-loader!sass-loader'
             scss: [
               "vue-style-loader",
               "css-loader",
@@ -107,7 +106,6 @@ module.exports = {
 
   plugins: [
     new CaseSensitivePathsPlugin(),
-    // new FriendlyErrorsWebpackPlugin(),
     new webpack.optimize.UglifyJsPlugin({
       sourceMap: true,
       minimize: false,
@@ -123,12 +121,7 @@ module.exports = {
         screw_ie8: true
       }
     }),
-    new ExtractTextPlugin({ filename: "../css/[name].css" }),
-    // new webpack.DefinePlugin({
-    //   "process.env": {
-    //     NODE_ENV: '"production"'
-    //   }
-    // })
+    new ExtractTextPlugin({ filename: "../css/[name].css" })
   ],
 
   node: {

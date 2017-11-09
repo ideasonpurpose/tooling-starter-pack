@@ -136,7 +136,11 @@ const npm = function(dest) {
             ]).filter(n => n);
             return _.defaultsDeep({}, pkg, template);
           })
-          .then(pkg => fs.writeJson("./site/package.json", sortPackageJson(pkg), { spaces: 2 }));
+          .then(pkg =>
+            fs.writeJson("./site/package.json", sortPackageJson(pkg), {
+              spaces: 2
+            })
+          );
       })
       .then(() => dest)
   );
@@ -160,8 +164,8 @@ const composer = function(dest) {
       )
       .catch(err => new Object()) // send a new object to merge with
       /**
-     * @param  {mixed} obj a populated or empty object (for merging) or false
-     */
+       * @param  {mixed} obj a populated or empty object (for merging) or false
+       */
       .then(pkg => {
         if (pkg) {
           return fs
@@ -189,19 +193,17 @@ const composer = function(dest) {
                 ],
                 ["wp-bootstrap/wp-bootstrap-navwalker"]
               );
-              if (
-                _.get(pkg, ["autoload", "files"]) &&
-                _.isArray(pkg.autoload.files)
-              ) {
-                pkg.autoload.files = _.union(pkg.autoload.files, [
-                  `${vendorDir}/wp-bootstrap-navwalker/class-wp-bootstrap-navwalker.php`
-                ]);
+              const nwf = [
+                vendorDir +
+                  "/wp-bootstrap-navwalker/class-wp-bootstrap-navwalker.php"
+              ];
+
+              const autoLoadFiles = _.get(pkg, ["autoload", "files"], nwf);
+
+              if (Array.isArray(autoLoadFiles)) {
+                _.set(pkg, ["autoload", "files"], _.union(autoLoadFiles, nwf));
               } else {
-                _.set(
-                  (template.autoload.files = [
-                    `${vendorDir}/wp-bootstrap-navwalker/class-wp-bootstrap-navwalker.php`
-                  ])
-                );
+                _.set(pkg, ["autoload", "files"], _.uniq([autoLoadFiles, nwf]));
               }
 
               return _.defaultsDeep({}, pkg, template);
