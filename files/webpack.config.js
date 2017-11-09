@@ -15,14 +15,14 @@ blConfig = {
 };
 
 module.exports = {
-  context: path.resolve(`./wp-content/themes/${pkg.wp_theme}/src`), //__dirname,
+  context: path.resolve(`./wp-content/themes/${pkg.name}/src`),
   entry: {
     app: './js/index.js',
     admin: './js/admin.js'
   },
 
   output: {
-    path: path.resolve(`./wp-content/themes/${pkg.wp_theme}/dist/js`), //path.resolve(__dirname, "../dist/js/"),
+    path: path.resolve(`./wp-content/themes/${pkg.name}/dist/js`),
     filename: "[name].js",
     publicPath: ""
   },
