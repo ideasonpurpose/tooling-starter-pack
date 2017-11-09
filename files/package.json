@@ -1,7 +1,5 @@
 {
-  "name": "placeholder",
   "version": "0.0.1",
-  "description": "placeholder",
   "private": true,
   "scripts": {
     "webpack": "webpack",

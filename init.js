@@ -5,6 +5,7 @@ const http = require("http");
 const path = require("path");
 const { exec, spawn } = require("child_process");
 const ora = require("ora");
+const sortPackageJson = require("sort-package-json");
 const _ = require("lodash");
 
 const inquirer = require("inquirer");
@@ -121,25 +122,21 @@ const npm = function(dest) {
       )
       .catch(err => new Object()) // send a new object to merge with
       /**
-     * @param  {mixed} obj a populated or empty object (for merging) or false
-     */
+       * @param  {mixed} obj a populated or empty object (for merging) or false
+       */
       .then(pkg => {
-        if (pkg) {
-          return fs
-            .readJson(`${__dirname}/files/package.json`)
-            .then(template => {
-              template.name = template.wp_theme = path.basename(dest);
+        return fs
+          .readJson(`${__dirname}/files/package.json`)
+          .then(template => {
+            template.name = path.basename(dest);
 
-              // manually pre-merge version_files into array
-              pkg.version_files = _.union(_.flatten([pkg.version_files]), [
-                path.relative("./site", dest) + "/style.css"
-              ]).filter(n => n);
-              return _.defaultsDeep({}, pkg, template);
-            })
-            .then(pkg =>
-              fs.writeJson("./site/package.json", pkg, { spaces: 2 })
-            );
-        }
+            // manually pre-merge version_files into array
+            pkg.version_files = _.union(_.flatten([pkg.version_files]), [
+              path.relative("./site", dest) + "/style.css"
+            ]).filter(n => n);
+            return _.defaultsDeep({}, pkg, template);
+          })
+          .then(pkg => fs.writeJson("./site/package.json", sortPackageJson(pkg), { spaces: 2 }));
       })
       .then(() => dest)
   );
