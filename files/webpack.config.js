@@ -10,7 +10,7 @@ const CaseSensitivePathsPlugin = require("case-sensitive-paths-webpack-plugin");
 
 const pkg = require("./package.json");
 
-blConfig = {
+const blConfig = {
   targets: { browsers: browserslist.findConfig(__dirname).defaults }
 };
 
