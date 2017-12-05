@@ -1,23 +1,42 @@
 /**
- * Version: 0.1.7
+ * Version: xxx
  */
 const path = require("path");
-const webpack = require("webpack");
 const autoprefixer = require("autoprefixer");
-const browserslist = require("browserslist");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const CaseSensitivePathsPlugin = require("case-sensitive-paths-webpack-plugin");
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 const pkg = require("./package.json");
 
-const blConfig = {
-  targets: { browsers: browserslist.findConfig(__dirname).defaults }
+/**
+ * These config objects are extracted so they can be reused by the normal
+ * pipeline and the vue-loader.
+ */
+const babelConfig = {
+  loader: "babel-loader",
+  options: {
+    babelrc: false,
+    presets: [["@babel/preset-env", { debug: false, useBuiltIns: "usage" }]]
+  }
 };
+const cssLoaders = [
+  "css-loader",
+  {
+    loader: "postcss-loader",
+    options: {
+      plugins: function() {
+        return [autoprefixer()];
+      }
+    }
+  },
+  "sass-loader"
+];
 
 module.exports = {
   context: path.resolve(`./wp-content/themes/${pkg.name}/src`),
   entry: {
-    app: "./js/index.js",
+    app: ["@babel/polyfill", "./js/index.js"],
     admin: "./js/admin.js"
   },
 
@@ -36,29 +55,13 @@ module.exports = {
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: {
-          loader: "babel-loader",
-          options: {
-            presets: [["env", blConfig]]
-          }
-        }
+        use: babelConfig
       },
       {
         test: /\.s?css/,
         loader: ExtractTextPlugin.extract({
           fallback: "style-loader",
-          use: [
-            "css-loader",
-            {
-              loader: "postcss-loader",
-              options: {
-                plugins: function() {
-                  return [autoprefixer()];
-                }
-              }
-            },
-            "sass-loader"
-          ]
+          use: cssLoaders
         })
       },
       {
@@ -78,19 +81,8 @@ module.exports = {
         loader: "vue-loader",
         options: {
           loaders: {
-            scss: [
-              "vue-style-loader",
-              "css-loader",
-              {
-                loader: "postcss-loader",
-                options: {
-                  plugins: function() {
-                    return [autoprefixer()];
-                  }
-                }
-              },
-              "sass-loader"
-            ]
+            js: babelConfig,
+            scss: ["vue-style-loader"].concat(cssLoaders)
           }
         }
       }
@@ -106,20 +98,8 @@ module.exports = {
 
   plugins: [
     new CaseSensitivePathsPlugin(),
-    new webpack.optimize.UglifyJsPlugin({
+    new UglifyJsPlugin({
       sourceMap: true,
-      minimize: false,
-      compress: {
-        screw_ie8: true, // React doesn't support IE8
-        warnings: false
-      },
-      mangle: {
-        screw_ie8: true
-      },
-      output: {
-        comments: false,
-        screw_ie8: true
-      }
     }),
     new ExtractTextPlugin({ filename: "../css/[name].css" })
   ],

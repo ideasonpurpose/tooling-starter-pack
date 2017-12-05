@@ -6,7 +6,7 @@
     "wpinit": "init.js"
   },
   "scripts": {
-    "preversion": "rm package-lock.json",
+    "preversion": "rm -f package-lock.json",
     "version": "version-everything && git add -u"
   },
   "main": "init.js",

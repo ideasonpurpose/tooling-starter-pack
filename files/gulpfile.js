@@ -39,11 +39,7 @@ const blCoverageReport = [
   )} of US users and ${redRound(blCoverage)} of global users.`
 ];
 
-// TODO: This seems too fragile...
-const DEVURL =
-  "https://" +
-  path.basename(path.dirname(findUp.sync("Vagrantfile")), ".dev") +
-  ".dev";
+const DEVURL = `https://${pkg.name}.dev`;
 
 const THEME_DIR = `./wp-content/themes/${pkg.name}`;
 const SRC_DIR = THEME_DIR + "/src";

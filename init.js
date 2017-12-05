@@ -96,6 +96,8 @@ const mkDirs = function(dest) {
     fs.copy(`${src}/js/index.js`, `${dest}/src/js/admin.js`, ow),
     fs.copy(`${src}/sass/main.scss`, `${dest}/src/sass/main.scss`, ow),
     fs.copy(`${src}/sass/_colors.scss`, `${dest}/src/sass/_colors.scss`, ow),
+    fs.copy(`${src}/sass/_bootstrap-custom.scss`, `${dest}/src/sass/_bootstrap-custom.scss`, ow),
+    fs.copy(`${src}/sass/_bootstrap-overrides.scss`, `${dest}/src/sass/_bootstrap-overrides.scss`, ow),
 
     fs.ensureDir(`${dest}/src/images`),
     fs.ensureDir(`${dest}/dist`),
