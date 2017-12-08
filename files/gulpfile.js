@@ -72,19 +72,17 @@ gulp.task("copy", function() {
 });
 
 gulp.task("sass", function() {
+  const dev = { sourceComments: true, outputStyle: "expanded" };
+  const prod = { outputStyle: "compressed" };
+  const sassConfig = Object.assign(
+    { includePaths: ["node_modules"] },
+    process.env.NODE_ENV == "production" ? prod : dev
+  );
   blCoverageReport.map(bl => gutil.log(bl));
   return gulp
     .src(SCSS_SRC)
     .pipe(sourcemaps.init())
-    .pipe(
-      sass({
-        // sourceComments: true,
-        // outputStyle: "expanded",
-        // outputStyle: "compact",
-        outputStyle: "compressed",
-        includePaths: ["node_modules"]
-      })
-    )
+    .pipe(sass(sassConfig))
     .on("error", function(err) {
       browserSync.sockets.emit("fullscreen:message", {
         title: `Sass Error: ${err.relativePath}:${err.line}:${err.column}`,

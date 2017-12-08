@@ -1,11 +1,12 @@
 /**
- * Version: xxx
+ * Version: 0.1.
  */
 const path = require("path");
+const webpack = require("webpack");
 const autoprefixer = require("autoprefixer");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const CaseSensitivePathsPlugin = require("case-sensitive-paths-webpack-plugin");
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
 
 const pkg = require("./package.json");
 
@@ -18,6 +19,7 @@ const babelConfig = {
   options: {
     babelrc: false,
     presets: [["@babel/preset-env", { debug: false, useBuiltIns: "usage" }]]
+    // plugins: ['@babel/transform-runtime']
   }
 };
 const cssLoaders = [
@@ -33,6 +35,16 @@ const cssLoaders = [
   "sass-loader"
 ];
 
+const plugins = [
+  new CaseSensitivePathsPlugin(),
+  new ExtractTextPlugin({ filename: "../css/[name].css" }),
+  new webpack.EnvironmentPlugin({ NODE_ENV: "development" })
+];
+
+if (process.env.NODE_ENV == "production") {
+  plugins.push(new UglifyJsPlugin({ sourceMap: true }));
+}
+
 module.exports = {
   context: path.resolve(`./wp-content/themes/${pkg.name}/src`),
   entry: {
@@ -47,8 +59,6 @@ module.exports = {
   },
 
   devtool: "source-map",
-
-  stats: "normal",
 
   module: {
     rules: [
@@ -96,17 +106,17 @@ module.exports = {
     }
   },
 
-  plugins: [
-    new CaseSensitivePathsPlugin(),
-    new UglifyJsPlugin({
-      sourceMap: true,
-    }),
-    new ExtractTextPlugin({ filename: "../css/[name].css" })
-  ],
+  plugins: plugins,
 
   node: {
+    dgram: "empty",
     fs: "empty",
     net: "empty",
-    tls: "empty"
+    tls: "empty",
+    child_process: "empty"
+  },
+
+  performance: {
+    hints: false
   }
 };
