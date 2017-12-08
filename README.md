@@ -1,5 +1,5 @@
 # IOP Tooling Starter Pack
-Version 0.1.8
+Version 0.1.9
 
 This boilerplate is purely about tooling, it is theme agnostic and can be used with any theme files.
 
