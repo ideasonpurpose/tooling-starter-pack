@@ -2,12 +2,13 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "webpack": "NODE_ENV=production webpack",
-    "env": "env",
     "_webpack-stats": "webpack -p --progress --profile --json > builds/stats.json",
     "analyzejs": "npm run _webpack-stats && webpack-bundle-analyzer builds/stats.json",
+    "build": "NODE_ENV=production gulp build",
+    "start": "gulp watch",
     "version": "version-everything && git add -u",
-    "postversion": "NODE_ENV=production gulp build"
+    "postversion": "npm run build",
+    "webpack": "NODE_ENV=production webpack"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.34",
