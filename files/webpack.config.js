@@ -7,6 +7,8 @@ const autoprefixer = require("autoprefixer");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const CaseSensitivePathsPlugin = require("case-sensitive-paths-webpack-plugin");
 const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
+  .BundleAnalyzerPlugin;
 
 const pkg = require("./package.json");
 
@@ -43,6 +45,10 @@ const plugins = [
 
 if (process.env.NODE_ENV == "production") {
   plugins.push(new UglifyJsPlugin({ sourceMap: true }));
+}
+
+if (process.env.WEBPACK_BUNDLE_ANALYZER) {
+  plugins.push(new BundleAnalyzerPlugin());
 }
 
 module.exports = {

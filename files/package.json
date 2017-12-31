@@ -2,8 +2,8 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "_webpack-stats": "webpack -p --progress --profile --json > builds/stats.json",
-    "analyzejs": "npm run _webpack-stats && webpack-bundle-analyzer builds/stats.json",
+    "analyzejs": "npm run webpack-analyzer",
+    "webpack-stats": "NODE_ENV=production WEBPACK_BUNDLE_ANALYZER=true webpack -p --progress --profile",
     "build": "NODE_ENV=production gulp build",
     "start": "gulp watch",
     "version": "version-everything && git add -u",
