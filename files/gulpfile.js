@@ -39,7 +39,7 @@ const blCoverageReport = [
   )} of US users and ${redRound(blCoverage)} of global users.`
 ];
 
-const DEVURL = `https://${pkg.name}.dev`;
+const DEVURL = `https://${pkg.name}.test`;
 
 const THEME_DIR = `./wp-content/themes/${pkg.name}`;
 const SRC_DIR = THEME_DIR + "/src";
