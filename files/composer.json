@@ -16,7 +16,7 @@
     "ideasonpurpose/wp-googleanalytics": "dev-master",
     "ideasonpurpose/wp-social-share-links": "dev-master",
     "ideasonpurpose/wp-vimeo-embed": "dev-master",
-    "wp-bootstrap/wp-bootstrap-navwalker": "v4.x-dev"
+    "wp-bootstrap/wp-bootstrap-navwalker": "dev-master"
   },
   "repositories": [
     {

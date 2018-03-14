@@ -5,21 +5,21 @@
 const path = require("path");
 
 const gulp = require("gulp");
-const gutil = require("gulp-util");
-const chalk = gutil.colors;
+const chalk = require("chalk");
+const log = require("fancy-log");
 const changed = require("gulp-changed");
 const globby = require("globby");
-const findUp = require("find-up");
-const sass = require("gulp-sass");
 const imagemin = require("gulp-imagemin");
 const browserSync = require("browser-sync").create();
-const sourcemaps = require("gulp-sourcemaps");
+const sass = require("node-sass");
 const autoprefixer = require("autoprefixer");
+const browserslist = require("browserslist");
 const postcss = require("gulp-postcss");
 const webpack = require("webpack");
 const zip = require("gulp-zip");
 const replace = require("gulp-replace");
 const filter = require("gulp-filter");
+const through2 = require("through2");
 
 const del = require("del");
 const runSequence = require("run-sequence");
@@ -28,7 +28,6 @@ const once = require("lodash.once");
 const pkg = require("./package.json");
 
 const redRound = n => chalk.magenta(Math.round(n * 1000) / 1000 + "%");
-const browserslist = require("browserslist");
 const blQuery = browserslist.findConfig(__dirname).defaults.join(", ");
 const blCoverage = browserslist.coverage(browserslist(blQuery));
 const blCoverageUS = browserslist.coverage(browserslist(blQuery), "US");
@@ -45,7 +44,7 @@ const THEME_DIR = `./wp-content/themes/${pkg.name}`;
 const SRC_DIR = THEME_DIR + "/src";
 const DIST_DIR = THEME_DIR + "/dist";
 const BUILD_DIR = "./builds";
-const SCSS_SRC = [SRC_DIR + "/sass/*.scss", "!" + SRC_DIR + "/sass/_*.scss"];
+const SASS_SRC = [SRC_DIR + "/sass/*.scss", "!" + SRC_DIR + "/sass/_*.scss"];
 
 const STATIC_ASSETS = [
   `${SRC_DIR}/**/*`,
@@ -75,27 +74,49 @@ gulp.task("sass", function() {
   const dev = { sourceComments: true, outputStyle: "expanded" };
   const prod = { outputStyle: "compressed" };
   const sassConfig = Object.assign(
-    { includePaths: ["node_modules"] },
+    { includePaths: [`${SRC_DIR}/sass`, "node_modules"] },
     process.env.NODE_ENV == "production" ? prod : dev
   );
-  blCoverageReport.map(bl => gutil.log(bl));
+  const sassErrorHandler = err => {
+    browserSync.sockets.emit("fullscreen:message", {
+      title: `Sass Error: ${err.relativePath}:${err.line}:${err.column}`,
+      body: err.message,
+      timeout: 10000
+    });
+    log(chalk.red(err));
+  };
+
+  blCoverageReport.map(bl => log(bl));
   return gulp
-    .src(SCSS_SRC)
-    .pipe(sourcemaps.init())
-    .pipe(sass(sassConfig))
-    .on("error", function(err) {
-      browserSync.sockets.emit("fullscreen:message", {
-        title: `Sass Error: ${err.relativePath}:${err.line}:${err.column}`,
-        body: err.message,
-        timeout: 10000
-      });
-      sass.logError.bind(this)(err);
-    })
-    .on("data", function(data) {
-      gutil.log("Sass: compiled", chalk.magenta(data.relative));
-    })
+    .src(SASS_SRC)
+    .pipe(
+      through2.obj(function(file, enc, cb) {
+        const config = Object.assign(sassConfig, {
+          data: file.contents.toString()
+        });
+        sass.render(config, (err, styles) => {
+          if (err) {
+            return sassErrorHandler(err);
+          }
+          log(
+            `Sass: compiled ${chalk.cyan(file.relative)} in ${chalk.magenta(
+              `${styles.stats.duration} ms`
+            )}`
+          );
+          file.contents = new Buffer(
+            styles.css
+              .toString()
+              .replace(
+                /(\/\* line [^,]+, )stdin( \*\/)/g,
+                `$1${path.relative(process.cwd(), file.path)}$2`
+              )
+          );
+          this.push(file);
+          cb();
+        });
+      })
+    )
     .pipe(postcss([autoprefixer()]))
-    .pipe(sourcemaps.write("./maps"))
     .pipe(gulp.dest(DIST_DIR + "/css"))
     .pipe(browserSync.stream({ match: "**/*.css" }));
 });
@@ -147,7 +168,7 @@ gulp.task("zip", function() {
     .pipe(zip(zipFile))
     .pipe(gulp.dest(BUILD_DIR))
     .on("data", function(data) {
-      gutil.log(
+      log(
         `Zipped build ${chalk.cyan(pkg.version)} to ${chalk.magenta(
           data.relative
         )}`
@@ -169,7 +190,7 @@ gulp.task("webpack", function(callback) {
         }
         return;
       }
-      gutil.log(stats.toString({ colors: true }));
+      log(stats.toString({ colors: true }));
 
       cb();
 
@@ -181,7 +202,7 @@ gulp.task("webpack", function(callback) {
     });
   } else {
     compiler.run(function(err, stats) {
-      gutil.log(stats.toString({ colors: true }));
+      log(stats.toString({ colors: true }));
       callback();
     });
   }
