@@ -6,6 +6,8 @@ const path = require("path");
 const { exec, spawn } = require("child_process");
 const ora = require("ora");
 const sortPackageJson = require("sort-package-json");
+const hasbin = require("hasbin");
+
 const _ = require("lodash");
 
 const inquirer = require("inquirer");
@@ -96,8 +98,16 @@ const mkDirs = function(dest) {
     fs.copy(`${src}/js/index.js`, `${dest}/src/js/admin.js`, ow),
     fs.copy(`${src}/sass/main.scss`, `${dest}/src/sass/main.scss`, ow),
     fs.copy(`${src}/sass/_colors.scss`, `${dest}/src/sass/_colors.scss`, ow),
-    fs.copy(`${src}/sass/_bootstrap-custom.scss`, `${dest}/src/sass/_bootstrap-custom.scss`, ow),
-    fs.copy(`${src}/sass/_bootstrap-overrides.scss`, `${dest}/src/sass/_bootstrap-overrides.scss`, ow),
+    fs.copy(
+      `${src}/sass/_bootstrap-custom.scss`,
+      `${dest}/src/sass/_bootstrap-custom.scss`,
+      ow
+    ),
+    fs.copy(
+      `${src}/sass/_bootstrap-overrides.scss`,
+      `${dest}/src/sass/_bootstrap-overrides.scss`,
+      ow
+    ),
 
     fs.ensureDir(`${dest}/src/images`),
     fs.ensureDir(`${dest}/dist`),
@@ -219,21 +229,28 @@ const composer = function(dest) {
   );
 };
 
+const useYarn = hasbin.sync("yarn");
+const confirmNpm = {
+  type: "confirm",
+  name: "npm",
+  default: true,
+  message: "Install node.js dependencies with npm?"
+};
+const confirmYarn = {
+  type: "confirm",
+  name: "yarn",
+  default: true,
+  message: "Install node.js dependencies with Yarn?"
+};
+const confirmComposer = {
+  type: "confirm",
+  name: "composer",
+  default: true,
+  message: "Install PHP dependencies with Composer?"
+};
+
 const installs = () => {
-  const installPrompt = [
-    {
-      type: "confirm",
-      name: "npm",
-      default: true,
-      message: "Install node.js dependencies with npm?"
-    },
-    {
-      type: "confirm",
-      name: "composer",
-      default: true,
-      message: "Install PHP dependencies with Composer?"
-    }
-  ];
+  const installPrompt = [useYarn ? confirmYarn : confirmNpm, confirmComposer];
 
   const installs = inquirer
     .prompt(installPrompt)
@@ -255,6 +272,26 @@ const installs = () => {
       }
       return answers;
     })
+    .catch(err => console.error(err))
+    .then(answers => {
+      if (answers.yarn) {
+        const spinner = ora("Running Yarn install...").start();
+        spinner.color = "green";
+        return execPromise("yarn install")
+          .then(() => {
+            spinner.succeed("Yarn install complete!");
+            return answers;
+          })
+          .catch(err => {
+            spinner.fail("Yarn failed to install");
+            console.log(err);
+
+            return answers;
+          });
+      }
+      return answers;
+    })
+    .catch(err => console.error(err))
     .then(answers => {
       if (answers.composer) {
         const spinner = ora("Running Composer install...").start();
@@ -271,7 +308,8 @@ const installs = () => {
           });
       }
       return answers;
-    });
+    })
+    .catch(err => console.error(err));
 };
 
 const execPromise = cmd => {
