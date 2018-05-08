@@ -1,5 +1,5 @@
 /**
- * Version: 0.1.x
+ * Version: 0.4.0
  */
 const path = require("path");
 const webpack = require("webpack");
