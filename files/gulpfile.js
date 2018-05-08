@@ -217,6 +217,15 @@ gulp.task("watch", ["build"], function() {
     proxy: DEVURL,
     reloadDelay: 75,
     reloadDebounce: 300,
+    rewriteRules: [
+      {
+        // Browsersync will grab a '...<' at the end of a kint-truncated url and escape it, breaking Kint's display
+        // This pre-corrects that error by injecting a space before the tag. This is enough to fix kint's display
+        // Almost certainly a Browsersync bug that I should go fix.
+        match: /\.\.\.<div /g,
+        replace: "... <div "
+      }
+    ],
     notify: {
       styles: {
         backgroundColor: "rgba(27, 32, 50, 0.5)",
