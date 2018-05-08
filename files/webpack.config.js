@@ -1,29 +1,58 @@
 /**
- * Version: 0.3.1
+ * Version: 0.1.x
  */
 const path = require("path");
 const webpack = require("webpack");
+// const webpack = require("webpack");
 const autoprefixer = require("autoprefixer");
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CaseSensitivePathsPlugin = require("case-sensitive-paths-webpack-plugin");
-const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
-const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
-  .BundleAnalyzerPlugin;
+const UglifyJSPlugin = require("uglifyjs-webpack-plugin");
+
+// const BabelEnginePlugin = require("babel-engine-plugin");
+const babelEnvDeps = require("webpack-babel-env-deps");
 
 const pkg = require("./package.json");
 
+// const browserslist = require("browserslist");
+// const blQuery = browserslist.findConfig(__dirname).defaults.join(", ");
+
+// console.log(blQuery);
+
+// console.log(process.argv);
+// console.log(process.env);
 /**
  * These config objects are extracted so they can be reused by the normal
  * pipeline and the vue-loader.
  */
-const babelConfig = {
-  loader: "babel-loader",
-  options: {
-    babelrc: false,
-    presets: [["@babel/preset-env", { debug: false, useBuiltIns: "usage" }]]
-    // plugins: ['@babel/transform-runtime']
-  }
-};
+// const babelConfig = {
+//   loader: "babel-loader",
+//   options: {
+//     // plugins: ["transform-es2015-arrow-functions"],
+//     presets: [
+//       [
+//         // "env",
+//         "@babel/preset-env",
+
+//         {
+//           // targets: { browsers: ["> 1%", "last 3 versions"] },
+//           debug: true,
+//           cacheDirectory: true
+
+//         }
+//       ]
+//     ]
+//   }
+// };
+// {
+//   loader: "babel-loader",
+//   options: {
+//     babelrc: false,
+//     presets: [["@babel/preset-env", { debug: true, useBuiltIns: "usage" }]]
+//     // plugins: ['@babel/transform-runtime']
+//   }
+// };
+
 const cssLoaders = [
   "css-loader",
   {
@@ -37,49 +66,137 @@ const cssLoaders = [
   "sass-loader"
 ];
 
+// const plugins = [
+//   new CaseSensitivePathsPlugin(),
+//   new ExtractTextPlugin({ filename: "../css/[name].css" })
+//   //   new webpack.EnvironmentPlugin({ NODE_ENV: "development" })
+// ];
+
+// if (process.env.NODE_ENV == "production") {
+//   plugins.push(new UglifyJsPlugin({ sourceMap: true }));
+// }
+
+// console.log(babelEnvDeps.exclude())
+
 const plugins = [
   new CaseSensitivePathsPlugin(),
-  new ExtractTextPlugin({ filename: "../css/[name].css" }),
-  new webpack.EnvironmentPlugin({ NODE_ENV: "development" })
+
+  new UglifyJSPlugin(),
+  // new ExtractTextPlugin("styles.css.[contentHash].css")
+  new MiniCssExtractPlugin({ filename: "../css/[name].css" })
+  // new BabelEnginePlugin({ presets: ["env"] }, {verbose:false}),
+  // new WebpackMonitor({launch: true})
+
+  // new webpack.optimize.CommonsChunkPlugin({
+  //   name: "commons",
+  //   // (the commons chunk name)
+
+  //   filename: "commons.js"
+  // })
 ];
 
-if (process.env.NODE_ENV == "production") {
-  plugins.push(new UglifyJsPlugin({ sourceMap: true }));
-}
-
 if (process.env.WEBPACK_BUNDLE_ANALYZER) {
+  const BundleAnalyzerPlugin = require("webpack-bundle-analyzer")
+    .BundleAnalyzerPlugin;
+
   plugins.push(new BundleAnalyzerPlugin());
 }
+
+if (process.env.WEBPACK_MONITOR) {
+  const WebpackMonitor = require("webpack-monitor");
+
+  plugins.push(new WebpackMonitor({ launch: true }));
+}
+
+const babelOptions = {
+  presets: [
+    [
+      "@babel/preset-env",
+      {
+        debug: false,
+        // useBuiltIns: 'usage',
+        useBuiltIns: "entry",
+        modules: false
+      }
+    ]
+  ],
+  plugins: [
+    require("@babel/plugin-syntax-dynamic-import"),
+    // require("@babel/plugin-transform-runtime")
+  ],
+
+  cacheDirectory: true
+};
+
+const jsLoader = {
+  test: /\.js$/,
+  // exclude: /node_modules/,
+  // exclude: '',
+  exclude: babelEnvDeps.exclude(),
+  // include: path.resolve(`./wp-content/themes/${pkg.name}/src`),
+  // include: path.resolve('.'),
+  // include: '.',
+
+  loader: "babel-loader",
+
+  options: babelOptions
+};
+
+const cssLoader = {
+  test: /\.(scss|css)$/,
+  use: [
+    // fallback to style-loader in development
+    process.env.NODE_ENV !== 'production' ? 'style-loader' : MiniCssExtractPlugin.loader,
+    "css-loader",
+    "sass-loader"
+]
+
+  // use: ExtractTextPlugin.extract({
+  //   use: [
+  //     {
+  //       loader: "css-loader",
+  //       options: {
+  //         sourceMap: true
+  //       }
+  //     },
+  //     {
+  //       loader: "sass-loader",
+  //       options: {
+  //         sourceMap: true
+  //       }
+  //     }
+  //   ],
+  //   fallback: "style-loader"
+  // })
+};
 
 module.exports = {
   context: path.resolve(`./wp-content/themes/${pkg.name}/src`),
   entry: {
-    app: ["@babel/polyfill", "./js/index.js"],
-    admin: "./js/admin.js"
+    app: ["./js/index.js"],
+    admin: ["./js/admin.js"]
   },
 
   output: {
     path: path.resolve(`./wp-content/themes/${pkg.name}/dist/js`),
     filename: "[name].js",
-    publicPath: ""
+    chunkFilename: "[name].bundle.js"
   },
-
-  devtool: "source-map",
 
   module: {
     rules: [
       {
-        test: /\.js$/,
-        exclude: /node_modules/,
-        use: babelConfig
+        test: /\.vue$/,
+        loader: "vue-loader",
+        options: {
+          loaders: {
+            js: [jsLoader],
+            scss: ["vue-style-loader"].concat(cssLoaders)
+          }
+        }
       },
-      {
-        test: /\.s?css/,
-        loader: ExtractTextPlugin.extract({
-          fallback: "style-loader",
-          use: cssLoaders
-        })
-      },
+      cssLoader,
+      jsLoader,
       {
         test: /\.(jpe?g|png|gif|svg)$/,
         use: [
@@ -91,16 +208,6 @@ module.exports = {
           },
           "image-webpack-loader"
         ]
-      },
-      {
-        test: /\.vue$/,
-        loader: "vue-loader",
-        options: {
-          loaders: {
-            js: babelConfig,
-            scss: ["vue-style-loader"].concat(cssLoaders)
-          }
-        }
       }
     ]
   },
@@ -114,15 +221,30 @@ module.exports = {
 
   plugins: plugins,
 
-  node: {
-    dgram: "empty",
-    fs: "empty",
-    net: "empty",
-    tls: "empty",
-    child_process: "empty"
+  optimization: {
+    // namedModules: true,
+    splitChunks: {
+      // name: 'commons',
+      // // chunks: "all"
+      // minChunks: 2
+
+      // splitChunks: {
+      name: "vendor",
+      chunks: "all"
+      // },
+    }
+    //     noEmitOnErrors: true,
+    // concatenateModules: true
   },
+  //   node: {
+  //     dgram: "empty",
+  //     fs: "empty",
+  //     net: "empty",
+  //     tls: "empty",
+  //     child_process: "empty"
+  //   },
 
   performance: {
-    hints: false
+    hints: "warning"
   }
 };

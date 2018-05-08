@@ -1,6 +1,6 @@
 /**
  * IOP Web Tooling Starter Pack
- * Version: 0.3.1
+ * Version: 0.x.x
  */
 const path = require("path");
 
@@ -13,8 +13,12 @@ const findUp = require("find-up");
 const sass = require("gulp-sass");
 const imagemin = require("gulp-imagemin");
 const browserSync = require("browser-sync").create();
-const autoprefixer = require("autoprefixer");
+
 const postcss = require("gulp-postcss");
+const autoprefixer = require("autoprefixer");
+const atImport = require("postcss-import");
+const cssnano = require("cssnano");
+
 const webpack = require("webpack");
 const zip = require("gulp-zip");
 const replace = require("gulp-replace");
@@ -71,17 +75,16 @@ gulp.task("copy", function() {
 });
 
 gulp.task("sass", function() {
-  const devConfig = {
+  const sassConfig = {
+    includePaths: ["node_modules"],
     sourceComments: true,
     outputStyle: "expanded"
   };
-  const prodConfig = {
-    outputStyle: "compressed"
-  };
-  const sassConfig = Object.assign(
-    { includePaths: ["node_modules"] },
-    process.env.NODE_ENV == "production" ? prodConfig : devConfig
-  );
+
+  const postcssPlugins = [autoprefixer({ grid: true }), atImport()];
+  if (process.env.NODE_ENV == "production") {
+    postcssPlugins.push(cssnano());
+  }
 
   blCoverageReport.map(bl => log(bl));
   return gulp
@@ -98,7 +101,7 @@ gulp.task("sass", function() {
     .on("data", function(data) {
       log("Sass: compiled", chalk.magenta(data.relative));
     })
-    .pipe(postcss([autoprefixer({ grid: true })]))
+    .pipe(postcss(postcssPlugins))
     .pipe(gulp.dest(DIST_DIR + "/css"))
     .pipe(browserSync.stream({ match: "**/*.css" }));
 });
