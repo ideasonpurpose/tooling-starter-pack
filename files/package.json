@@ -38,6 +38,7 @@
     "gulp-imagemin": "^4.1.0",
     "gulp-postcss": "^7.0.1",
     "gulp-replace": "^0.6.1",
+    "gulp-sass": "^4.0.1",
     "gulp-zip": "^4.1.0",
     "lodash.once": "^4.1.1",
     "postcss-loader": "^2.0.10",
