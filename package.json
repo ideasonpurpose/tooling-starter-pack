@@ -1,6 +1,6 @@
 {
   "name": "iop-web-tooling-starter-pack",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Common webdev tools and settings used by Ideas On Purpose.",
   "bin": {
     "wpinit": "init.js"
