@@ -1,6 +1,6 @@
 /**
  * IOP Web Tooling Starter Pack
- * Version: 0.4.0
+ * Version: 0.5.0
  */
 const path = require("path");
 
