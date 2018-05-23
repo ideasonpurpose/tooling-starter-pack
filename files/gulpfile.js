@@ -12,6 +12,7 @@ const globby = require("globby");
 const findUp = require("find-up");
 const sass = require("gulp-sass");
 const imagemin = require("gulp-imagemin");
+const imageminMozjpeg = require('imagemin-mozjpeg');
 const browserSync = require("browser-sync").create();
 
 const postcss = require("gulp-postcss");
@@ -58,15 +59,15 @@ const STATIC_ASSETS = [
 ];
 
 gulp.task("default", ["build"]);
-gulp.task("build", function(cb) {
+gulp.task("build", function (cb) {
   runSequence("clean", ["copy", "sass", "imagemin", "webpack"], "zip", cb);
 });
 
-gulp.task("clean", function() {
+gulp.task("clean", function () {
   return del([DIST_DIR, BUILD_DIR]);
 });
 
-gulp.task("copy", function() {
+gulp.task("copy", function () {
   return gulp
     .src(STATIC_ASSETS)
     .pipe(changed(DIST_DIR))
@@ -74,7 +75,7 @@ gulp.task("copy", function() {
     .pipe(browserSync.stream());
 });
 
-gulp.task("sass", function() {
+gulp.task("sass", function () {
   const sassConfig = {
     includePaths: ["node_modules"],
     sourceComments: true,
@@ -90,7 +91,7 @@ gulp.task("sass", function() {
   return gulp
     .src(SCSS_SRC)
     .pipe(sass(sassConfig))
-    .on("error", function(err) {
+    .on("error", function (err) {
       browserSync.sockets.emit("fullscreen:message", {
         title: `Sass Error: ${err.relativePath}:${err.line}:${err.column}`,
         body: err.message,
@@ -98,7 +99,7 @@ gulp.task("sass", function() {
       });
       sass.logError.bind(this)(err);
     })
-    .on("data", function(data) {
+    .on("data", function (data) {
       log("Sass: compiled", chalk.magenta(data.relative));
     })
     .pipe(postcss(postcssPlugins))
@@ -106,35 +107,53 @@ gulp.task("sass", function() {
     .pipe(browserSync.stream({ match: "**/*.css" }));
 });
 
-gulp.task("imagemin", function() {
+gulp.task("imagemin", function () {
+  const prodPlugins = [
+    imagemin.gifsicle({ optimizationLevel: 3 }),
+    imagemin.optipng({ optimizationLevel: 5 }),
+    imageminMozjpeg({ quality: 80 }),
+    imagemin.svgo({
+      floatPrecision: 3,
+      plugins: [
+        // {mergePaths: true},
+        { cleanupIDs: false },
+        { convertTransform: true },
+        { removeTitle: true },
+        { sortAttrs: true }
+      ]
+    })
+
+  ];
+  const devPlugins = [
+    imagemin.gifsicle(),
+    imagemin.optipng({ optimizationLevel: 0 }),
+    imagemin.jpegtran({ progressive: true }),
+    imagemin.svgo({
+      js2svg: { pretty: true },
+      floatPrecision: 3,
+      plugins: [
+        { cleanupIDs: false },
+        { convertTransform: true },
+        { removeTitle: true },
+        { sortAttrs: true }
+      ]
+    })
+  ];
+
+  const plugins = (process.env.NODE_ENV === "production") ? prodPlugins : devPlugins;
+
   return gulp
     .src(`${SRC_DIR}/images/**/*`)
     .pipe(
-      imagemin(
-        [
-          imagemin.gifsicle(),
-          imagemin.jpegtran({ progressive: true }),
-          imagemin.optipng({ optimizationLevel: 4 }),
-          imagemin.svgo({
-            js2svg: { pretty: true },
-            floatPrecision: 3,
-            plugins: [
-              // {mergePaths: true},
-              { cleanupIDs: false },
-              { convertTransform: true },
-              { removeTitle: true },
-              { sortAttrs: true }
-            ]
-          })
-        ],
-        { verbose: false }
+      imagemin(plugins,
+        { verbose: process.env.NODE_ENV === "production" }
       )
     )
     .pipe(gulp.dest(`${DIST_DIR}/images`))
     .pipe(browserSync.stream());
 });
 
-gulp.task("zip", function() {
+gulp.task("zip", function () {
   const pkg = require("./package.json");
   const versionDir = `${pkg.name}-${pkg.version}`.replace(/[ .]/g, "_");
   const zipFile = `${versionDir}.zip`;
@@ -152,7 +171,7 @@ gulp.task("zip", function() {
     .pipe(autoloadFilter.restore)
     .pipe(zip(zipFile))
     .pipe(gulp.dest(BUILD_DIR))
-    .on("data", function(data) {
+    .on("data", function (data) {
       log(
         `Zipped build ${chalk.cyan(pkg.version)} to ${chalk.magenta(
           data.relative
@@ -161,7 +180,7 @@ gulp.task("zip", function() {
     });
 });
 
-gulp.task("webpack", function(callback) {
+gulp.task("webpack", function (callback) {
   const isWatch = process.argv.indexOf("watch") > -1;
   const webpack_config = require("./webpack.config.js");
   webpack_config.mode =
@@ -192,14 +211,14 @@ gulp.task("webpack", function(callback) {
       browserSync.reload(assets);
     });
   } else {
-    compiler.run(function(err, stats) {
+    compiler.run(function (err, stats) {
       log(stats.toString({ colors: true }));
       callback();
     });
   }
 });
 
-gulp.task("watch", ["build"], function() {
+gulp.task("watch", ["build"], function () {
   browserSync.init({
     files: `${THEME_DIR}/**/*.php`,
     logConnections: true,

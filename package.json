@@ -13,6 +13,7 @@
   "dependencies": {
     "fs-extra": "^5.0.0",
     "hasbin": "^1.2.3",
+    "imagemin-mozjpeg": "^7.0.0",
     "inquirer": "^5.1.0",
     "lodash": "^4.17.4",
     "ora": "^2.0.0",
