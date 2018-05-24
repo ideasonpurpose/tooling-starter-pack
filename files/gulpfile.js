@@ -144,6 +144,7 @@ gulp.task("imagemin", function () {
 
   return gulp
     .src(`${SRC_DIR}/images/**/*`)
+    .pipe(changed(`${DIST_DIR}/images`))
     .pipe(
       imagemin(plugins,
         { verbose: process.env.NODE_ENV === "production" }
