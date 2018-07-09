@@ -8,12 +8,11 @@ const gulp = require("gulp");
 const chalk = require("chalk");
 const log = require("fancy-log");
 const changed = require("gulp-changed");
-const globby = require("globby");
-const findUp = require("find-up");
+const filesize = require("filesize");
+
 const sass = require("gulp-sass");
 const imagemin = require("gulp-imagemin");
-const imageminMozjpeg = require('imagemin-mozjpeg');
-const browserSync = require("browser-sync").create();
+const imageminMozjpeg = require("imagemin-mozjpeg");
 
 const postcss = require("gulp-postcss");
 const autoprefixer = require("autoprefixer");
@@ -24,6 +23,9 @@ const webpack = require("webpack");
 const zip = require("gulp-zip");
 const replace = require("gulp-replace");
 const filter = require("gulp-filter");
+
+const browserSync = require("browser-sync").create();
+const ip = require("internal-ip");
 
 const del = require("del");
 const runSequence = require("run-sequence");
@@ -59,15 +61,15 @@ const STATIC_ASSETS = [
 ];
 
 gulp.task("default", ["build"]);
-gulp.task("build", function (cb) {
+gulp.task("build", function(cb) {
   runSequence("clean", ["copy", "sass", "imagemin", "webpack"], "zip", cb);
 });
 
-gulp.task("clean", function () {
+gulp.task("clean", function() {
   return del([DIST_DIR, BUILD_DIR]);
 });
 
-gulp.task("copy", function () {
+gulp.task("copy", function() {
   return gulp
     .src(STATIC_ASSETS)
     .pipe(changed(DIST_DIR))
@@ -75,7 +77,7 @@ gulp.task("copy", function () {
     .pipe(browserSync.stream());
 });
 
-gulp.task("sass", function () {
+gulp.task("sass", function() {
   const sassConfig = {
     includePaths: ["node_modules"],
     sourceComments: true,
@@ -91,7 +93,7 @@ gulp.task("sass", function () {
   return gulp
     .src(SCSS_SRC)
     .pipe(sass(sassConfig))
-    .on("error", function (err) {
+    .on("error", function(err) {
       browserSync.sockets.emit("fullscreen:message", {
         title: `Sass Error: ${err.relativePath}:${err.line}:${err.column}`,
         body: err.message,
@@ -99,7 +101,7 @@ gulp.task("sass", function () {
       });
       sass.logError.bind(this)(err);
     })
-    .on("data", function (data) {
+    .on("data", function(data) {
       log("Sass: compiled", chalk.magenta(data.relative));
     })
     .pipe(postcss(postcssPlugins))
@@ -107,7 +109,7 @@ gulp.task("sass", function () {
     .pipe(browserSync.stream({ match: "**/*.css" }));
 });
 
-gulp.task("imagemin", function () {
+gulp.task("imagemin", function() {
   const prodPlugins = [
     imagemin.gifsicle({ optimizationLevel: 3 }),
     imagemin.optipng({ optimizationLevel: 5 }),
@@ -122,7 +124,6 @@ gulp.task("imagemin", function () {
         { sortAttrs: true }
       ]
     })
-
   ];
   const devPlugins = [
     imagemin.gifsicle(),
@@ -140,21 +141,18 @@ gulp.task("imagemin", function () {
     })
   ];
 
-  const plugins = (process.env.NODE_ENV === "production") ? prodPlugins : devPlugins;
+  const plugins =
+    process.env.NODE_ENV === "production" ? prodPlugins : devPlugins;
 
   return gulp
     .src(`${SRC_DIR}/images/**/*`)
     .pipe(changed(`${DIST_DIR}/images`))
-    .pipe(
-      imagemin(plugins,
-        { verbose: process.env.NODE_ENV === "production" }
-      )
-    )
+    .pipe(imagemin(plugins, { verbose: process.env.NODE_ENV === "production" }))
     .pipe(gulp.dest(`${DIST_DIR}/images`))
     .pipe(browserSync.stream());
 });
 
-gulp.task("zip", function () {
+gulp.task("zip", function() {
   const pkg = require("./package.json");
   const versionDir = `${pkg.name}-${pkg.version}`.replace(/[ .]/g, "_");
   const zipFile = `${versionDir}.zip`;
@@ -172,16 +170,15 @@ gulp.task("zip", function () {
     .pipe(autoloadFilter.restore)
     .pipe(zip(zipFile))
     .pipe(gulp.dest(BUILD_DIR))
-    .on("data", function (data) {
-      log(
-        `Zipped build ${chalk.cyan(pkg.version)} to ${chalk.magenta(
-          data.relative
-        )}`
-      );
+    .on("data", function(data) {
+      const version = chalk.cyan(pkg.version);
+      const rel = chalk.magenta(data.relative);
+      const size = chalk.gray("(" + filesize(data.contents.length) + ")");
+      log(`Zipped build ${version} to ${rel} ${size}`);
     });
 });
 
-gulp.task("webpack", function (callback) {
+gulp.task("webpack", function(callback) {
   const isWatch = process.argv.indexOf("watch") > -1;
   const webpack_config = require("./webpack.config.js");
   webpack_config.mode =
@@ -212,17 +209,18 @@ gulp.task("webpack", function (callback) {
       browserSync.reload(assets);
     });
   } else {
-    compiler.run(function (err, stats) {
+    compiler.run(function(err, stats) {
       log(stats.toString({ colors: true }));
       callback();
     });
   }
 });
 
-gulp.task("watch", ["build"], function () {
+gulp.task("watch", ["build"], function() {
   browserSync.init({
     files: `${THEME_DIR}/**/*.php`,
     logConnections: true,
+    host: ip.v4.sync(),
     open: false,
     plugins: ["bs-fullscreen-message", "browsersync-mdns"],
     proxy: DEVURL,
