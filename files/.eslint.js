@@ -1,6 +1,6 @@
 /**
  * iop-web-tooling-starter-pack
- * Version: 0.5.1
+ * Version: 0.5.2
  */
 module.exports = {
   env: {
