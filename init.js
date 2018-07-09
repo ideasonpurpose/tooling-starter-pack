@@ -31,7 +31,8 @@ const themes = fs
       prev.push({
         name: fs
           .readFileSync(`./site/wp-content/themes/${theme}/style.css`, encUTF8)
-          .match(/Theme Name: (.*)/)[1],
+          .match(/Theme Name: (.*)/)[1]
+          .trim(),
         value: `./site/wp-content/themes/${theme}`
       });
     } catch (err) {}
@@ -142,10 +143,17 @@ const npm = function(dest) {
           .then(template => {
             template.name = path.basename(dest);
 
-            // manually pre-merge version_files into array
-            pkg.version_files = _.union(_.flatten([pkg.version_files]), [
-              path.relative("./site", dest) + "/style.css"
-            ]).filter(n => n);
+            // manually pre-merge version_files
+            pkg.version_files = _
+              .union(_.flatten([pkg.version_files]), [
+                path.relative("./site", dest) + "/style.css"
+              ])
+              .filter(n => n);
+            // manually pre-merge devDependencies into pkg
+            pkg.devDependencies = _.defaults(
+              template.devDependencies,
+              pkg.devDependencies
+            );
             return _.defaultsDeep({}, pkg, template);
           })
           .then(pkg =>
