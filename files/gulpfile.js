@@ -2,7 +2,6 @@
  * IOP Web Tooling Starter Pack
  * Version: 0.5.2
  */
-const path = require("path");
 
 const gulp = require("gulp");
 const chalk = require("chalk");

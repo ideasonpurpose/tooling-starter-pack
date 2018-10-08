@@ -16,7 +16,7 @@
     "ideasonpurpose/wp-googleanalytics": "dev-master",
     "ideasonpurpose/wp-social-share-links": "dev-master",
     "ideasonpurpose/wp-vimeo-embed": "dev-master",
-    "wp-bootstrap/wp-bootstrap-navwalker": "dev-master"
+    "ideasonpurpose/wp-svg-lib": "dev-master"
   },
   "repositories": [
     {
@@ -42,7 +42,12 @@
     {
       "type": "vcs",
       "url": "https://github.com/ideasonpurpose/wp-vimeo-embed"
-    }
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/ideasonpurpose/wp-svg-lib.git",
+      "no-api": true
+}
   ],
   "version": "0.5.2"
 }
