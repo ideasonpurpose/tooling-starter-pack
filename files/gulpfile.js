@@ -80,7 +80,10 @@ gulp.task("sass", function() {
   const sassConfig = {
     includePaths: ["node_modules"],
     sourceComments: true,
-    outputStyle: "expanded"
+    outputStyle: "expanded",
+    importer: (url, prev, done) =>
+      done({ file: url.replace(/^~/, "node_modules/") })
+
   };
 
   const postcssPlugins = [autoprefixer({ grid: true }), atImport()];
